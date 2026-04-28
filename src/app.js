@@ -1,37 +1,37 @@
-// const express = require("express");
-// const cors = require("cors");
-// const path = require("path");
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
-// const authRoutes = require("./routes/authRoutes");
-// const ownerRoutes = require("./routes/ownerRoutes");
+const authRoutes = require("./routes/authRoutes");
+const ownerRoutes = require("./routes/ownerRoutes");
 
-// const app = express();
+const app = express();
 
-// /* =====================
-//    Middleware
-// ===================== */
-// app.use(cors()); // allow cross-origin requests
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+/* =====================
+   Middleware
+===================== */
+app.use(cors()); // allow cross-origin requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// /* =====================
-//    API Routes
-// ===================== */
-// app.use("/api", authRoutes);
-// app.use(ownerRoutes);
+/* =====================
+   API Routes
+===================== */
+app.use("/api", authRoutes);
+app.use(ownerRoutes);
 
-// /* ===============================
-//    Serve React dist
-// ================================ */
-// const distPath = path.join(__dirname, "../dist");
-// app.use(express.static(distPath));
+/* ===============================
+   Serve React dist
+================================ */
+const distPath = path.join(__dirname, "../dist");
+app.use(express.static(distPath));
 
-// // Catch-all for React Router
-// app.use((req, res) => {
-//   res.sendFile(path.join(distPath, "index.html"));
-// });  
+// Catch-all for React Router
+app.use((req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});  
 
-// module.exports = app;
+module.exports = app;
 
 
 
@@ -116,29 +116,29 @@
 
 
 
-const express = require("express");
-const cors = require("cors");
-const authRoutes = require("./routes/authRoutes");
-const ownerRoutes = require("./routes/ownerRoutes");
+// const express = require("express");
+// const cors = require("cors");
+// const authRoutes = require("./routes/authRoutes");
+// const ownerRoutes = require("./routes/ownerRoutes");
 
-const app = express();
+// const app = express();
 
-// CORS configuration
-app.use(cors({
-  origin: "http://localhost:5173", // your frontend URL
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true // allow sending auth headers
-}));
+// // CORS configuration
+// app.use(cors({
+//   origin: "http://localhost:5173", // your frontend URL
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   credentials: true // allow sending auth headers
+// }));
 
-app.use(express.json());
+// app.use(express.json());
 
-// === Serve uploaded images ===
-const path = require("path");
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// // === Serve uploaded images ===
+// const path = require("path");
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes
-app.use("/api", authRoutes);
-app.use(ownerRoutes);
+// // Routes
+// app.use("/api", authRoutes);
+// app.use(ownerRoutes);
 
-module.exports = app;
+// module.exports = app;

@@ -1,0 +1,24 @@
+.editor-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 5px 8px 0 rgba(0,0,0,.4);
+}
+
+.toolbar {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ql-toolbar {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.ql-container {
+  min-height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

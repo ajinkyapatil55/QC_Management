@@ -1,0 +1,24 @@
+#modal-content {
+	width: 100%;
+}
+
+#pdf_navbar {
+	position: fixed; /* or absolute, depending on your layout */
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1000; /* Adjust the value accordingly */
+}
+.main-body-modal {
+	height: 100vh;
+	overflow-y: auto;
+	overflow-x: auto;
+	
+}
+
+@media only screen and (max-width: 768px) {
+	.main-body-modal {
+		height: 60vh;
+		
+	}
+}

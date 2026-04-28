@@ -1,0 +1,429 @@
+/* ========== Dropdown menu styles ========== */
+.dropdown-menu {
+  background-color: #343a40;
+}
+
+.dropdown-menu a {
+  color: white;
+}
+
+.dropdown-menu a:hover {
+  background-color: #5a6268;
+}
+
+.btn-link {
+  font-weight: 400;
+  color: white;
+  text-decoration: none;
+}
+
+/* ========== Mobile sidebar styles ========== */
+@media screen and (max-width: 600px) {
+  .scroll_bar {
+    float: left;
+    width: auto;
+    overflow-y: auto;
+    height: 200px;
+  }
+
+  .sidebar {
+    width: 200px;
+    /* keep sidebar readable on small screen */
+  }
+
+  .nav-link {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+/* ========== Background colors ========== */
+.bg-gradient-primary1 {
+  background-color: black;
+}
+
+.bg-gradient-primary2 {
+  background-color: black;
+}
+
+.bg-gradient-primary3 {
+  background-color: black;
+}
+
+.bg_hr {
+  background-color: #ffb13d !important;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.bg_admin {
+  background-color: #518fec !important;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.bg_emp {
+  background-color: #bbce44 !important;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  color: black !important;
+}
+
+/* ========== Sidebar base ========== */
+.sidebar {
+  width: 250px;
+  transition: width 0.3s ease;
+}
+
+/* .sidebar.toggled {
+  width: 200px !important;
+} */
+
+.sidebar_logo {
+  transition: all 0.3s ease;
+}
+
+.sidebar-dark #sidebarToggle::after,
+.sidebar-dark.toggled #sidebarToggle::after {
+  color: black;
+}
+
+.sidebar #sidebarToggle {
+  height: 0px;
+  width: 0px;
+}
+
+/* Sidebar/Topbar Logo Fix */
+.sidebar_logo img,
+.navbar-brand img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  /* keeps it centered */
+}
+
+/* Extra control for small devices */
+@media screen and (max-width: 600px) {
+
+  .sidebar_logo img,
+  .navbar-brand img {
+    max-height: 40px;
+    /* adjust as per your design */
+    width: auto;
+  }
+}
+
+
+/* ========== Collapsed sidebar links ========== */
+.sidebar.toggled .nav-link {
+  justify-content: center;
+  /* center icons */
+  padding: 10px 0;
+}
+
+.sidebar.toggled .nav-link span {
+  display: none;
+  /* hide text, keep only icons */
+}
+
+/* ========== Collapse dropdown items ========== */
+.collapse-inner {
+  border: 1px solid #ccc;
+  margin-left: 0px;
+  transition: all 0.3s ease;
+}
+
+.collapse-item {
+  padding: 5px 15px;
+  display: block;
+  color: #333;
+  font-size: 14px;
+  width: 100%;
+  text-align: left;
+}
+
+.collapse-item:hover {
+  text-decoration: underline;
+  color: #000;
+}
+
+/* ========== Active menu styles ========== */
+.nav-item.bg_hr .nav-link,
+.nav-item.bg_admin .nav-link,
+.nav-item.bg_emp .nav-link {
+  color: black !important;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+/* ========== Nav link base styles (MERGED) ========== */
+/* Vertical: icon on top, label below */
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  /* stack */
+  align-items: center;
+  /* center horizontally */
+  justify-content: center;
+  width: 100%;
+  padding: 12px 8px;
+  text-align: center;
+  gap: 4px;
+  /* space between icon and text */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* icon sizing */
+.nav-link i {
+  font-size: 18px;
+  margin: 0;
+  /* no side margin in vertical layout */
+  flex-shrink: 0;
+}
+
+/* label below icon */
+.nav-link .link-text {
+  display: block;
+  font-size: 12px;
+  line-height: 1.2;
+  max-width: 100%;
+  white-space: normal;
+  /* allow wrapping */
+  overflow: visible;
+  /* don't clip */
+  text-overflow: clip;
+  word-break: break-word;
+  /* long words wrap */
+}
+
+/* Collapsed (hide only labels, keep icons centered) */
+.sidebar.toggled .nav-link {
+  padding: 10px 0;
+}
+
+.sidebar.toggled .nav-link .link-text {
+  display: none;
+}
+
+/* Mobile tweaks */
+@media screen and (max-width: 600px) {
+  .sidebar {
+    width: 100px;
+  }
+
+  /* narrower works with vertical labels */
+  .nav-link {
+    padding: 10px 4px;
+  }
+
+  .nav-link i {
+    font-size: 20px;
+  }
+
+  .nav-link .link-text {
+    font-size: 11px;
+  }
+}
+
+/* When sidebar collapsed */
+.sidebar.toggled .nav-link {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar.toggled .nav-link .link-text {
+  display: none;
+  /* hide text, keep only icon */
+}
+
+/* ========== Dropdown flyout styles (right side) ========== */
+.nav-item {
+  position: relative;
+  /* anchor for absolute child */
+}
+
+.collapse-inner {
+  position: absolute;
+  top: 0;
+  /* align top with parent nav link */
+  left: 100%;
+  /* push to right side of parent */
+  min-width: 180px;
+  /* width of flyout container */
+  background-color: #343a40;
+  border-radius: 4px;
+  border: 1px solid #444;
+  z-index: 999;
+  /* keep above sidebar */
+  padding: 5px 0;
+  display: block;
+  /* always block when open */
+}
+
+.collapse-item {
+  padding: 8px 12px;
+  color: black;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.collapse-item:hover {
+  background-color: #5a6268;
+  color: #fff;
+}
+
+.collapse-item.active {
+  background-color: #518fec;
+  /* Or use your role color */
+  font-weight: bold;
+  color: #fff !important;
+  border-radius: 4px;
+}
+
+.nav-item .nav-link.active {
+  background-color: #518fec;
+  /* fallback */
+  color: #fff !important;
+  border-radius: 5px;
+}
+
+.bg_admin .nav-link.active {
+  background-color: #1a73e8;
+}
+
+.bg_hr .nav-link.active {
+  background-color: #ffb13d;
+}
+
+.bg_emp .nav-link.active {
+  background-color: #bbce44;
+  color: black !important;
+}
+
+/* ===== Dropdown flyout default (open to right, top aligned) ===== */
+.collapse-inner {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-width: 180px;
+  background-color: #343a40;
+  border-radius: 4px;
+  border: 1px solid #444;
+  z-index: 999;
+  padding: 5px 0;
+}
+
+/* ===== Dropup variant (open upward, aligned to bottom) ===== */
+.nav-item.dropup .collapse-inner {
+  top: auto;
+  bottom: 0;
+  /* stick to bottom of parent */
+  left: 100%;
+}
+
+/* Remove only list markers, not FontAwesome ::before icons */
+.collapse-inner,
+.collapse-inner ul,
+.collapse-inner li {
+  list-style: none !important;
+  background-image: none !important;
+  padding-left: 0;
+  margin: 0;
+}
+
+.collapse-inner li::marker {
+  content: none !important;
+}
+
+
+.dashboard-bg {
+  padding: 15px;
+}
+
+/* CARD */
+.priority-card {
+  background: linear-gradient(145deg, #ffffff, #f1f4f8);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.35s ease;
+  position: relative;
+}
+
+.priority-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+}
+
+/* CIRCLE */
+.circle-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* CENTER TEXT */
+.circle-count {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: popIn 0.9s ease;
+}
+
+.count-number {
+  font-size: 25px;
+  font-weight: 800;
+  color: #17a2b8 ;
+}
+
+.count-label {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  margin-top: 0px;
+  color: #17a2b8 ;
+}
+
+/* LEGEND */
+.legend-row {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.legend-row span {
+  display: block;
+  margin: 3px 0;
+}
+
+/* GLOW */
+.priority-card::after {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+      rgba(76, 175, 80, 0.12),
+      transparent 70%);
+  z-index: -1;
+}
+
+/* ANIMATION */
+@keyframes popIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+

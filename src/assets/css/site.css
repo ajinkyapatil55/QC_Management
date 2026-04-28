@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.carousel-caption h3 {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}

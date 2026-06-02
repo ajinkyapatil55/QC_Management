@@ -45,9 +45,7 @@ const dashboardController = require("../controllers/dashboardController");
 const ownerDashboardController = require("../controllers/ownerDashboardController");
 const changepasswordController = require("../controllers/changepasswordController");
 const assingtaskController = require("../controllers/assingtaskController");
-
-
-
+const uploadDocumentsController = require("../controllers/uploadDocumentsController");
 
 // Save Token Route
 router.post("/saveToken", jwtToken.saveToken);
@@ -240,12 +238,26 @@ router.get("/rest_api_get_hr_managers_by_company/:companyId", auth, assingtaskCo
 router.get("/rest_api_get_all_assignments", auth, assingtaskController.getAllAssignments);
 router.delete("/rest_api_delete_assignment/:id", auth, assingtaskController.deleteAssignment);
 router.post("/rest_api_create_assignment", auth, assingtaskController.createAssignment);
+router.get("/rest_api_get_processes_by_part/:partId", auth, assingtaskController.getProcessesByPart);
 
 
 router.get("/rest_api_get_assignment_count/:inspectorId", auth, assingtaskController.getAssignmentCount);
 router.get("/rest_api_get_my_assignments/:inspectorId", auth, assingtaskController.getMyAssignments);
 router.post("/rest_api_update_assignment_status", auth, assingtaskController.updateAssignmentStatus);
 router.get("/rest_api_get_user_details_by_task", auth, assingtaskController.getUserDetailsTask);
+
+
+
+
+// Upload Documents Route
+router.post("/api/rest_api_upload_employee_documents", auth, uploadDocumentsController.uploadEmployeeDocuments);
+router.get("/api/rest_api_get_employee_documents/:userId", auth, uploadDocumentsController.getEmployeeDocumentsById);
+
+
+
+
+
+
 
 
 
@@ -357,33 +369,6 @@ router.post("/rest_api_save_room_details_at_transaction", auth, transactionContr
 router.post("/rest_api_update_room_details_at_transaction", auth, transactionController.updateRoomTransaction);
 
 
-
-
-
-// router.post("/api_get_all_rooms_by_site", auth, roomController.getRoomsBySite);
-// router.post("/rest_api_get_receipt_details", auth, transactionController.getReceiptDetails);
-// router.post("/rest_api_get_total_balance_from_transaction", auth, transactionController.getTotalBalanceFromTransaction);
-// router.post("/api_get_all_account_type_list", auth, accountTypeController.getAllAccountTypeList);
-// router.post("/rest_api_update_receipt_at_transaction", auth, transactionController.updateReceipt);
-// router.post("/rest_api_save_receipt_at_transaction", auth, transactionController.saveReceipt);
-
-// router.post("/api_get_all_expense_details", auth, expenseController.getAllExpenses);
-// router.post("/rest_api_save_expense_details", auth, expenseController.saveExpense);
-// router.post("/rest_api_update_expense_details", auth, expenseController.updateExpense);
-// router.post("/rest_api_delete_expense_details", auth, expenseController.deleteExpense);
-
-// router.post("/api_get_all_tenant_details_for_report", auth, tenantController.getAllTenantDetailsForReport);
-
-// router.post("/rest_api_get_billing_details_for_report", auth, transactionController.getBillingDetailsForReport);
-// router.post("/api_get_expense_details_for_report", auth, expenseController.getExpenseReport);
-// router.post("/rest_api_get_receipt_details_for_report", auth, transactionController.getReceiptDetailsForReport);
-// router.post("/api_get_all_tenant_details_for_leaving_report",auth,tenantController.tenantLeavingReport);
-//  router.post("/api_get_all_reminder_details", auth, reminderController.getAllReminders);
-
-
-//   router.post("/rest_api_save_reminder_details", auth, reminderController.saveReminder);
-//  router.post("/rest_api_update_reminder_details", auth, reminderController.updateReminder);
-//  router.post("/rest_api_delete_reminder_details", auth, reminderController.deleteReminder);
 
 
 

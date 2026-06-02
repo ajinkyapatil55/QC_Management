@@ -1,17 +1,5 @@
 const db = require("../config/db");
 
-// 1. Fetch All Clients
-// exports.getAllClientsOwner = async (req, res) => {
-//     try {
-//         const sql = "SELECT id, company FROM client ORDER BY company DESC";
-//         const [clients] = await db.query(sql);
-//         res.status(200).json(clients);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error fetching clients" });
-//     }
-// };
-
-
 // 1. Fetch All Clients (Including Address)
 exports.getAllClientsOwner = async (req, res) => {
     try {
@@ -38,7 +26,7 @@ exports.getPartsByClient = async (req, res) => {
         if (client_id && client_id !== 'all') {
             sql += " WHERE client_id = ?";
             params.push(client_id);
-        }
+        } 
         sql += " ORDER BY partName ASC";
 
         const [parts] = await db.query(sql, params);
@@ -49,25 +37,6 @@ exports.getPartsByClient = async (req, res) => {
 };
 
 // 3. Fetch Unique Inspectors - Chained to Client
-// exports.getInspectorsByClient = async (req, res) => {
-//     try {
-//         const { client_id } = req.params;
-//         let sql = "SELECT DISTINCT inspectorName FROM addqc";
-//         let params = [];
-
-//         if (client_id && client_id !== 'all') {
-//             sql += " WHERE client_id = ?";
-//             params.push(client_id);
-//         }
-//         sql += " ORDER BY inspectorName ASC";
-
-//         const [inspectors] = await db.query(sql, params);
-//         const list = inspectors.map(row => row.inspectorName).filter(n => n);
-//         res.status(200).json(list);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error fetching inspectors" });
-//     }
-// };
 
 exports.getInspectorsByClient = async (req, res) => {
     try {

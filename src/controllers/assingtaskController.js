@@ -42,9 +42,54 @@ exports.getHRManagersByCompany = async (req, res) => {
     }
 };
 
+// ================= GET PROCESSES BY PART ID =================
+// Resolves numeric partId to string partName to match against process_master
+exports.getProcessesByPart = async (req, res) => {
+    try {
+        const { partId } = req.params;
+        const client_id = req.user?.client_id;
+
+        if (!partId || partId === 'undefined') {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Valid Part ID is required" 
+            });
+        }
+
+        // 1. Fetch partName using the part ID
+        const [partRows] = await db.query("SELECT partName FROM parts WHERE id = ?", [partId]);
+        if (partRows.length === 0) {
+            return res.status(200).json({ success: true, data: [] });
+        }
+        
+        const partName = partRows[0].partName;
+
+        // 2. Fetch processes linked to this specific partName and client_id
+        const processSql = `
+            SELECT id, processName, note 
+            FROM process_master 
+            WHERE client_id = ? AND partName = ?
+            ORDER BY processName ASC
+        `;
+        const [processes] = await db.query(processSql, [client_id, partName]);
+
+        res.status(200).json({
+            success: true,
+            data: processes
+        });
+
+    } catch (error) {
+        console.error("Error fetching processes:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
 // ================= CREATE ASSIGNMENT =================
+// Saves assignments alongside the target process_id
+// Replace this block inside your backend controllers/assigntaskController.js -> createAssignment function:
+
 exports.createAssignment = async (req, res) => {
-    const { companyId, partId, inspectors, managers, type } = req.body;
+    const { companyId, partId, processId, inspectors, managers, type } = req.body;
 
     if (!companyId || !partId || !inspectors || !Array.isArray(inspectors) || inspectors.length === 0) {
         return res.status(400).json({
@@ -58,27 +103,29 @@ exports.createAssignment = async (req, res) => {
         await connection.beginTransaction();
 
         const singleManagerId = Array.isArray(managers) ? managers[0] : managers;
-
         if (!singleManagerId) {
             await connection.rollback();
             connection.release();
             return res.status(400).json({ success: false, message: "No Manager assigned." });
         }
 
+        // --- FIX SAFEGUARD: Convert empty UI select strings to proper database NULL ---
+        const cleanProcessId = processId === "" || processId === undefined ? null : Number(processId);
+
         const assignSql = `
-            INSERT INTO assignments (client_id, part_id, manager_id, assignment_type, status) 
-            VALUES (?, ?, ?, ?, 'Active')
+            INSERT INTO assignments (client_id, part_id, process_id, manager_id, assignment_type, status) 
+            VALUES (?, ?, ?, ?, ?, 'Active')
         `;
 
         const [result] = await connection.query(assignSql, [
             Number(companyId),
             Number(partId),
+            cleanProcessId, // Safely handles the clean integer or null value
             Number(singleManagerId),
             type
         ]);
 
         const newAssignmentId = result.insertId;
-
         const inspectorData = inspectors.map(insId => [
             newAssignmentId,
             Number(insId)
@@ -109,11 +156,14 @@ exports.getAllAssignments = async (req, res) => {
                 a.id, 
                 a.assignment_type AS type,
                 a.part_id,
+                a.process_id,
                 p.partName,
                 u_mgr.name AS managerName,
-                GROUP_CONCAT(DISTINCT u_ins.name ORDER BY u_ins.name SEPARATOR ', ') AS inspectorName,
+                pm.processName,
+                pm.note,
+                GROUP_CONCAT(DISTINCT u_ins.name ORDER BY ai.inspector_id SEPARATOR ', ') AS inspectorName,
                 GROUP_CONCAT(DISTINCT ai.inspector_id ORDER BY ai.inspector_id SEPARATOR ',') AS inspectorIds,
-                GROUP_CONCAT(ai.status SEPARATOR ', ') AS status,
+                GROUP_CONCAT(ai.status ORDER BY ai.inspector_id SEPARATOR ', ') AS status,
                 a.created_at,
                 MAX(ai.updated_at) AS updated_at
             FROM assignments a
@@ -121,8 +171,19 @@ exports.getAllAssignments = async (req, res) => {
             JOIN user u_ins ON ai.inspector_id = u_ins.user_id
             LEFT JOIN parts p ON a.part_id = p.id
             LEFT JOIN user u_mgr ON a.manager_id = u_mgr.user_id
+            /* Maps directly to the process layout using saved primary key */
+            LEFT JOIN process_master pm ON a.process_id = pm.id
             WHERE a.client_id = ?
-            GROUP BY a.id, a.assignment_type, a.part_id, p.partName, u_mgr.name, a.created_at
+            GROUP BY 
+                a.id, 
+                a.assignment_type, 
+                a.part_id, 
+                a.process_id,
+                p.partName, 
+                u_mgr.name, 
+                a.created_at,
+                pm.processName,
+                pm.note
             ORDER BY a.created_at DESC
         `;
 
@@ -185,11 +246,15 @@ exports.getMyAssignments = async (req, res) => {
                 a.assignment_type,
                 p.partName AS part_name,
                 cl.company AS client_name,
-                ai.status AS current_status
+                ai.status AS current_status,
+                pm.processName,
+                pm.note
             FROM assignments a
             JOIN assignment_inspectors ai ON a.id = ai.assignment_id
             LEFT JOIN parts p ON a.part_id = p.id
             LEFT JOIN client cl ON a.client_id = cl.id
+            /* Joined to capture the correct processed data assigned */
+            LEFT JOIN process_master pm ON a.process_id = pm.id
             WHERE ai.inspector_id = ? 
             AND a.client_id = ?
             ORDER BY a.created_at DESC

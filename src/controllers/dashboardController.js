@@ -330,22 +330,36 @@ exports.getAllReportQCEntries = async (req, res) => {
 
 
 
-// ================== HR Dashboard ======================== 
+// ========================================== 
+// HR Dashboard
+// ==========================================
 
 // ================= 1. SHIFT WISE REPORT =================
 exports.getShiftWiseReport = async (req, res) => {
   try {
     const clientId = req.user.client_id;
+    const { start_date, end_date } = req.query;
+
+    let whereClause = "WHERE client_id = ?";
+    const params    = [clientId];
+
+    if (start_date && end_date) {
+      // ✅ Replace 'created_at' with your actual date column name
+      whereClause += " AND DATE(created_at) BETWEEN ? AND ?";
+      params.push(start_date, end_date);
+    }
+
     const [rows] = await db.query(
-      `SELECT 
-        shift, 
-        SUM(inspectedQty) AS inspected, 
-        SUM(reworkQty) AS rework, 
-        SUM(rejectedQty) AS reject
-      FROM addqc 
-      WHERE client_id = ? 
-      GROUP BY shift`,
-      [clientId]
+      `SELECT
+        shift,
+        SUM(inspectedQty) AS inspected,
+        SUM(reworkQty)    AS rework,
+        SUM(rejectedQty)  AS reject
+      FROM addqc
+      ${whereClause}
+      GROUP BY shift
+      ORDER BY shift`,
+      params
     );
     res.json(rows);
   } catch (err) {
@@ -358,19 +372,29 @@ exports.getShiftWiseReport = async (req, res) => {
 exports.getDefectWiseReport = async (req, res) => {
   try {
     const clientId = req.user.client_id;
+    const { start_date, end_date } = req.query;
+
+    let whereClause = "WHERE a.client_id = ?";
+    const params    = [clientId];
+
+    if (start_date && end_date) {
+      // ✅ Replace 'created_at' with your actual date column name
+      whereClause += " AND DATE(a.created_at) BETWEEN ? AND ?";
+      params.push(start_date, end_date);
+    }
 
     const [rows] = await db.query(
-      `SELECT 
-    r.defect_name AS name,
-    r.partName,
-    SUM(r.qty) AS value
-  FROM reportqc r
-  JOIN addqc a ON r.addqc_id = a.id
-  WHERE a.client_id = ?
-  GROUP BY r.defect_name, r.partName`,
-      [clientId]
+      `SELECT
+        r.defect_name AS name,
+        r.partName,
+        SUM(r.qty)    AS value
+      FROM reportqc r
+      JOIN addqc a ON r.addqc_id = a.id
+      ${whereClause}
+      GROUP BY r.defect_name, r.partName
+      ORDER BY value DESC`,
+      params
     );
-
     res.json(rows);
   } catch (err) {
     console.error("Defect Report Error:", err);
@@ -382,16 +406,28 @@ exports.getDefectWiseReport = async (req, res) => {
 exports.getPartWiseReport = async (req, res) => {
   try {
     const clientId = req.user.client_id;
+    const { start_date, end_date } = req.query;
+
+    let whereClause = "WHERE client_id = ?";
+    const params    = [clientId];
+
+    if (start_date && end_date) {
+      // ✅ Replace 'created_at' with your actual date column name
+      whereClause += " AND DATE(created_at) BETWEEN ? AND ?";
+      params.push(start_date, end_date);
+    }
+
     const [rows] = await db.query(
-      `SELECT 
-        partName AS part, 
-        SUM(inspectedQty) AS inspected, 
-        SUM(reworkQty) AS rework, 
-        SUM(rejectedQty) AS reject
-      FROM addqc 
-      WHERE client_id = ? 
-      GROUP BY partName`,
-      [clientId]
+      `SELECT
+        partName          AS part,
+        SUM(inspectedQty) AS inspected,
+        SUM(reworkQty)    AS rework,
+        SUM(rejectedQty)  AS reject
+      FROM addqc
+      ${whereClause}
+      GROUP BY partName
+      ORDER BY partName`,
+      params
     );
     res.json(rows);
   } catch (err) {
@@ -404,16 +440,28 @@ exports.getPartWiseReport = async (req, res) => {
 exports.getInspectorWiseReport = async (req, res) => {
   try {
     const clientId = req.user.client_id;
+    const { start_date, end_date } = req.query;
+
+    let whereClause = "WHERE client_id = ?";
+    const params    = [clientId];
+
+    if (start_date && end_date) {
+      // ✅ Replace 'created_at' with your actual date column name
+      whereClause += " AND DATE(created_at) BETWEEN ? AND ?";
+      params.push(start_date, end_date);
+    }
+
     const [rows] = await db.query(
-      `SELECT 
-        inspectorName AS name, 
-        SUM(inspectedQty) AS inspected, 
-        SUM(reworkQty) AS rework, 
-        SUM(rejectedQty) AS reject
-      FROM addqc 
-      WHERE client_id = ? 
-      GROUP BY inspectorName`,
-      [clientId]
+      `SELECT
+        inspectorName     AS name,
+        SUM(inspectedQty) AS inspected,
+        SUM(reworkQty)    AS rework,
+        SUM(rejectedQty)  AS reject
+      FROM addqc
+      ${whereClause}
+      GROUP BY inspectorName
+      ORDER BY inspected DESC`,
+      params
     );
     res.json(rows);
   } catch (err) {
@@ -421,7 +469,6 @@ exports.getInspectorWiseReport = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 
 

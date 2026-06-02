@@ -6,6 +6,14 @@ exports.authenticate = async (req, res) => {
     const result = await authService.authenticate(req.body);
     res.json(result);
   } catch (e) {
+    // 🛑 CRITICAL INTERCEPT: Catch the account inactive error string from service
+    if (e.message === "ACCOUNT_INACTIVE") {
+      return res.status(403).json({ 
+        message: "Your account status is Inactive. Please contact your system Administrator." 
+      });
+    }
+    
+    // Default fallback error status for standard incorrect credentials
     res.status(401).json({ message: e.message });
   }
 };
@@ -70,8 +78,6 @@ exports.saveToken = async (req, res) => {
 };
 
 
-
-// authController.js
 exports.getCurrentUser = async (req, res) => {
   try {
     console.log(req.user.username)
@@ -100,6 +106,3 @@ exports.getCurrentUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-

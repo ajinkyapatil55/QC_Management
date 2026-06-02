@@ -9,6 +9,7 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
+  //init_command: "SET session max_allowed_packet = 134217728;"
 });
 
 module.exports = pool;

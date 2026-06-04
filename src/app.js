@@ -1,4 +1,5 @@
 // use to live server with PM2...
+// app.js
 
 const express = require("express");
 const cors = require("cors");
@@ -10,51 +11,40 @@ const ownerRoutes = require("./routes/ownerRoutes");
 const app = express();
 
 /* ==========================================
-   1. Global Middleware
+   Middleware
 ========================================== */
-app.use(cors()); 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ==========================================
-   2. API & Business Logic Routes
+   Static Files
+========================================== */
+const distPath = path.join(__dirname, "../dist");
+const uploadsPath = path.join(__dirname, "uploads");
+
+console.log("Frontend Path:", distPath);
+console.log("Uploads Path:", uploadsPath);
+
+// Serve React Build & Uploads first so they don't conflict with API routes
+app.use(express.static(distPath));
+app.use("/uploads", express.static(uploadsPath));
+
+/* ==========================================
+   API Routes
 ========================================== */
 app.use("/api", authRoutes);
 app.use(ownerRoutes);
 
 /* ==========================================
-   3. Static Folders (React Build & Media Uploads)
+   React SPA Fallback
 ========================================== */
-// Serves frontend static files from the root dist folder
-const distPath = path.join(__dirname, "../dist"); 
-app.use(express.static(distPath));
-
-// FIX: Points directly to E:\Rent_NodeJs\Rent_NodeJs\src\uploads
-const uploadsPath = path.join(__dirname, "./uploads");
-app.use("/uploads", express.static(uploadsPath));
-
-// Verification logs for PM2 startup
-console.log(" -> [Static Frontend] Serving from:", distPath);
-console.log(" -> [Uploaded Images] Serving from:", uploadsPath);
-
-/* ==========================================
-   4. Crash-Proof Catch-All Middleware
-========================================== */
-app.use((req, res, next) => {
-  if (req.url.startsWith("/api") || /\.(png|jpg|jpeg|gif|svg|ico|css|js|woff2?)$/i.test(req.url)) {
-    return res.status(404).send("Requested asset or endpoint not found");
-  }
-
-  if (req.method === "GET") {
-    return res.sendFile(path.join(distPath, "index.html"));
-  }
-
-  next();
+// Standard fallback middleware that avoids path strings entirely
+app.use((req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 module.exports = app;
-
-
 
 
 

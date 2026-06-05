@@ -1,33 +1,33 @@
 // //live server to use PM2... 
 
 
-// const path = require("path");
-// require("dotenv").config({ path: path.join(__dirname, "../.env") });
-
-// const express = require("express");
-// const app = require("./app");
-
-// const PORT = process.env.PORT || 8080;
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });   
-
-
-
 const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
-require("dotenv").config({
-  path: path.join(__dirname, "../.env"),
-});
-
+const express = require("express");
 const app = require("./app");
 
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+});   
+
+
+
+// const path = require("path");
+
+// require("dotenv").config({
+//   path: path.join(__dirname, "../.env"),
+// });
+
+// const app = require("./app");
+
+// const PORT = process.env.PORT || 8080;
+
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
 
 

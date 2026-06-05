@@ -14,8 +14,12 @@ const app = express();
    Middleware
 ========================================== */
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Increase the limit for JSON payloads (e.g., to 50 Megabytes)
+app.use(express.json({ limit: "50mb" }));
+
+// Increase the limit for URL-encoded payloads (e.g., to 50 Megabytes)
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 /* ==========================================
    Static Files

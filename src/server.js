@@ -1,4 +1,4 @@
-// //live server to use PM2... 
+//live server to use PM2... 
 
 
 const path = require("path");
@@ -15,19 +15,6 @@ app.listen(PORT, () => {
 
 
 
-// const path = require("path");
-
-// require("dotenv").config({
-//   path: path.join(__dirname, "../.env"),
-// });
-
-// const app = require("./app");
-
-// const PORT = process.env.PORT || 8080;
-
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
 
 
 
@@ -41,7 +28,8 @@ app.listen(PORT, () => {
 
 
 
-//local server to use ...
+
+// //local server to use ...
 
 
 // require("dotenv").config();

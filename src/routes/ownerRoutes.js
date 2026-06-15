@@ -46,6 +46,7 @@ const ownerDashboardController = require("../controllers/ownerDashboardControlle
 const changepasswordController = require("../controllers/changepasswordController");
 const assingtaskController = require("../controllers/assingtaskController");
 const uploadDocumentsController = require("../controllers/uploadDocumentsController");
+const adminDashboardController = require("../controllers/adminDashboardController");
 
 // Save Token Route
 router.post("/saveToken", jwtToken.saveToken);
@@ -256,7 +257,10 @@ router.get("/api/rest_api_get_employee_documents/:userId", auth, uploadDocuments
 
 
 
-
+// Admin Dashboard Routes
+router.get("/rest_api_get_admin_parts",      auth, adminDashboardController.getAdminParts);
+router.get("/rest_api_get_admin_inspectors", auth, adminDashboardController.getAdminInspectors);
+router.get("/rest_api_dashboard_admin",      auth, adminDashboardController.getAdminDashboardData);
 
 
 

@@ -66,6 +66,139 @@ exports.getInspectorsByClient = async (req, res) => {
 
 // 4. Fetch Dashboard Data with Chained Filters and Date Logic
 
+// exports.getOwnerDashboardData = async (req, res) => {
+//     try {
+//         const { client_id, part_id, inspector, dateMode, month, year, singleDate, startDate, endDate } = req.query;
+
+//         let whereClause = "WHERE 1=1";
+//         let params = [];
+
+//         // --- 1. Filter Logic ---
+//         if (client_id && client_id !== 'all') {
+//             whereClause += " AND a.client_id = ?";
+//             params.push(client_id);
+//         }
+//         if (part_id && part_id !== 'all') {
+//             // FIX: Changed 'part_name' to 'partName' to match your 'parts' table column
+//             whereClause += " AND a.partName = (SELECT partName FROM parts WHERE id = ? LIMIT 1)";
+//             params.push(part_id);
+//         }
+//         if (inspector && inspector !== "All Inspectors") {
+//             whereClause += " AND a.inspectorName = ?";
+//             params.push(inspector);
+//         }       
+
+//         // --- 2. Date Logic ---
+//         if (dateMode === "Month") {
+//             whereClause += " AND MONTHNAME(a.created_at) = ? AND YEAR(a.created_at) = ?";
+//             params.push(month, year);
+//         } else if (dateMode === "Single Day") {
+//             whereClause += " AND DATE(a.created_at) = ?";
+//             params.push(singleDate);
+//         } else if (dateMode === "Date Range") {
+//             whereClause += " AND DATE(a.created_at) BETWEEN ? AND ?";
+//             params.push(startDate, endDate);
+//         }
+
+//         // --- 3. Stats Query ---
+//         const [statsResult] = await db.query(`
+//             SELECT 
+//                 SUM(inspectedQty) as inspected, 
+//                 SUM(acceptedQty) as accepted, 
+//                 SUM(reworkQty) as rework, 
+//                 SUM(rejectedQty) as rejected 
+//             FROM addqc a ${whereClause}
+//         `, params);
+
+//         const s = statsResult[0] || {};
+//         const total = parseFloat(s.inspected) || 0;
+
+//         const stats = {     
+//             inspected: total,
+//             accepted: parseFloat(s.accepted) || 0,
+//             rework: parseFloat(s.rework) || 0,
+//             rejected: parseFloat(s.rejected) || 0,
+//             reworkPPM: total > 0 ? Math.round(((parseFloat(s.rework) || 0) / total) * 1000000) : 0,
+//             rejectionPPM: total > 0 ? Math.round(((parseFloat(s.rejected) || 0) / total) * 1000000) : 0
+//         };
+
+//         // --- 4. Detailed Data Queries ---
+
+//         // Trend Data (Production Trend Analysis)
+//         const [graphical] = await db.query(`
+//             SELECT 
+//                 DATE_FORMAT(created_at, '%Y-%m-%d') as name, 
+//                 partName, 
+//                 MAX(inspectorName) as inspectorName, 
+//                 SUM(inspectedQty) as inspected, 
+//                 SUM(acceptedQty) as accepted, 
+//                 SUM(reworkQty) as rework, 
+//                 SUM(rejectedQty) as rejected 
+//             FROM addqc a ${whereClause} 
+//             GROUP BY name, partName 
+//             ORDER BY name ASC`, params);
+
+//         // Location Comparison
+//         const [locationComparison] = await db.query(`
+//             SELECT location, SUM(inspectedQty) as inspected 
+//             FROM addqc a ${whereClause} 
+//             GROUP BY location`, params);
+
+//         // Part Quality Split
+//         const [partQualitySplit] = await db.query(`
+//             SELECT partName, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
+//             FROM addqc a ${whereClause} 
+//             GROUP BY partName`, params);
+
+//         // Day Wise
+//         const [dayWise] = await db.query(`
+//             SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, MAX(inspectorName) as inspectorName, MAX(partName) as partName, SUM(inspectedQty) as inspected, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
+//             FROM addqc a ${whereClause} GROUP BY date ORDER BY date DESC`, params);
+
+//         // Part Wise
+//         const [partWise] = await db.query(`
+//             SELECT partName as part_name, MAX(DATE_FORMAT(created_at, '%Y-%m-%d')) as date, MAX(inspectorName) as inspectorName, SUM(inspectedQty) as inspected, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
+//             FROM addqc a ${whereClause} GROUP BY partName`, params);
+
+//         // Report History
+//         const [report] = await db.query(`
+//             SELECT id, inspectorName, inspectedQty, acceptedQty, reworkQty, rejectedQty, total, partName, shift, location, DATE_FORMAT(created_at, '%Y-%m-%d') as date 
+//             FROM addqc a ${whereClause} ORDER BY id DESC`, params);
+
+//         // Top 5 Defects
+//         const [defectResults] = await db.query(`
+//             SELECT 
+//                 r.defect_name as defectName, 
+//                 SUM(r.qty) as count,
+//                 a.partName,
+//                 a.inspectorName
+//             FROM reportqc r
+//             INNER JOIN addqc a ON r.addqc_id = a.id
+//             ${whereClause}
+//             GROUP BY r.defect_name, a.partName, a.inspectorName 
+//             ORDER BY count DESC 
+//             LIMIT 5
+//         `, params);
+
+//         res.status(200).json({ 
+//             stats, 
+//             graphical, 
+//             locationComparison, 
+//             partQualitySplit, 
+//             dayWise, 
+//             partWise, 
+//             report, 
+//             topDefects: defectResults 
+//         });
+
+//     } catch (error) {
+//         console.error("Backend Error Details:", error);
+//         res.status(500).json({ message: "Dashboard calculation error", error: error.message });
+//     }
+// };
+
+
+// 4. Fetch Dashboard Data with Chained Filters and Date Logic
 exports.getOwnerDashboardData = async (req, res) => {
     try {
         const { client_id, part_id, inspector, dateMode, month, year, singleDate, startDate, endDate } = req.query;
@@ -74,19 +207,27 @@ exports.getOwnerDashboardData = async (req, res) => {
         let params = [];
 
         // --- 1. Filter Logic ---
-        if (client_id && client_id !== 'all') {
+        if (client_id && client_id !== 'all' && client_id !== 'undefined') {
             whereClause += " AND a.client_id = ?";
             params.push(client_id);
         }
-        if (part_id && part_id !== 'all') {
-            // FIX: Changed 'part_name' to 'partName' to match your 'parts' table column
-            whereClause += " AND a.partName = (SELECT partName FROM parts WHERE id = ? LIMIT 1)";
-            params.push(part_id);
+        
+        if (part_id && part_id !== 'all' && part_id !== 'undefined') {
+            // SAFE CHECK: If part_id is already a string name like "CARGO SEAT", match it directly.
+            // If it's a number ID, pull it via subquery.
+            if (isNaN(part_id)) {
+                whereClause += " AND a.partName = ?";
+                params.push(part_id);
+            } else {
+                whereClause += " AND a.partName = (SELECT partName FROM parts WHERE id = ? LIMIT 1)";
+                params.push(part_id);
+            }
         }
-        if (inspector && inspector !== "All Inspectors") {
-            whereClause += " AND a.inspectorName = ?";
+        
+        if (inspector && inspector !== "All Inspectors" && inspector !== 'undefined') {
+            whereClause += " AND TRIM(a.inspectorName) = TRIM(?)";
             params.push(inspector);
-        }
+        }       
 
         // --- 2. Date Logic ---
         if (dateMode === "Month") {
@@ -103,10 +244,10 @@ exports.getOwnerDashboardData = async (req, res) => {
         // --- 3. Stats Query ---
         const [statsResult] = await db.query(`
             SELECT 
-                SUM(inspectedQty) as inspected, 
-                SUM(acceptedQty) as accepted, 
-                SUM(reworkQty) as rework, 
-                SUM(rejectedQty) as rejected 
+                SUM(CAST(inspectedQty AS SIGNED)) as inspected, 
+                SUM(CAST(acceptedQty AS SIGNED)) as accepted, 
+                SUM(CAST(reworkQty AS SIGNED)) as rework, 
+                SUM(CAST(rejectedQty AS SIGNED)) as rejected 
             FROM addqc a ${whereClause}
         `, params);
 
@@ -122,48 +263,59 @@ exports.getOwnerDashboardData = async (req, res) => {
             rejectionPPM: total > 0 ? Math.round(((parseFloat(s.rejected) || 0) / total) * 1000000) : 0
         };
 
-        // --- 4. Detailed Data Queries ---
+        // --- 4. Detailed Data Queries (With Uniform Groupings) ---
 
         // Trend Data (Production Trend Analysis)
         const [graphical] = await db.query(`
             SELECT 
-                DATE_FORMAT(created_at, '%Y-%m-%d') as name, 
-                partName, 
-                MAX(inspectorName) as inspectorName, 
-                SUM(inspectedQty) as inspected, 
-                SUM(acceptedQty) as accepted, 
-                SUM(reworkQty) as rework, 
-                SUM(rejectedQty) as rejected 
+                DATE_FORMAT(a.created_at, '%Y-%m-%d') as name, 
+                a.partName, 
+                MAX(a.inspectorName) as inspectorName, 
+                SUM(a.inspectedQty) as inspected, 
+                SUM(a.acceptedQty) as accepted, 
+                SUM(a.reworkQty) as rework, 
+                SUM(a.rejectedQty) as rejected 
             FROM addqc a ${whereClause} 
-            GROUP BY name, partName 
+            GROUP BY DATE_FORMAT(a.created_at, '%Y-%m-%d'), a.partName 
             ORDER BY name ASC`, params);
 
         // Location Comparison
         const [locationComparison] = await db.query(`
-            SELECT location, SUM(inspectedQty) as inspected 
+            SELECT a.location, SUM(a.inspectedQty) as inspected 
             FROM addqc a ${whereClause} 
-            GROUP BY location`, params);
+            GROUP BY a.location`, params);
 
         // Part Quality Split
         const [partQualitySplit] = await db.query(`
-            SELECT partName, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
+            SELECT a.partName, SUM(a.acceptedQty) as accepted, SUM(a.reworkQty) as rework, SUM(a.rejectedQty) as rejected 
             FROM addqc a ${whereClause} 
-            GROUP BY partName`, params);
+            GROUP BY a.partName`, params);
 
         // Day Wise
         const [dayWise] = await db.query(`
-            SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, MAX(inspectorName) as inspectorName, MAX(partName) as partName, SUM(inspectedQty) as inspected, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
-            FROM addqc a ${whereClause} GROUP BY date ORDER BY date DESC`, params);
+            SELECT 
+                DATE_FORMAT(a.created_at, '%Y-%m-%d') as date, 
+                MAX(a.inspectorName) as inspectorName, 
+                MAX(a.partName) as partName, 
+                SUM(a.inspectedQty) as inspected, 
+                SUM(a.acceptedQty) as accepted, 
+                SUM(a.reworkQty) as rework, 
+                SUM(a.rejectedQty) as rejected 
+            FROM addqc a ${whereClause} 
+            GROUP BY DATE_FORMAT(a.created_at, '%Y-%m-%d') 
+            ORDER BY date DESC`, params);
 
         // Part Wise
         const [partWise] = await db.query(`
-            SELECT partName as part_name, MAX(DATE_FORMAT(created_at, '%Y-%m-%d')) as date, MAX(inspectorName) as inspectorName, SUM(inspectedQty) as inspected, SUM(acceptedQty) as accepted, SUM(reworkQty) as rework, SUM(rejectedQty) as rejected 
-            FROM addqc a ${whereClause} GROUP BY partName`, params);
+            SELECT a.partName as part_name, MAX(DATE_FORMAT(a.created_at, '%Y-%m-%d')) as date, MAX(a.inspectorName) as inspectorName, SUM(a.inspectedQty) as inspected, SUM(a.acceptedQty) as accepted, SUM(a.reworkQty) as rework, SUM(a.rejectedQty) as rejected 
+            FROM addqc a ${whereClause} 
+            GROUP BY a.partName`, params);
 
         // Report History
         const [report] = await db.query(`
-            SELECT id, inspectorName, inspectedQty, acceptedQty, reworkQty, rejectedQty, total, partName, shift, location, DATE_FORMAT(created_at, '%Y-%m-%d') as date 
-            FROM addqc a ${whereClause} ORDER BY id DESC`, params);
+            SELECT a.id, a.inspectorName, a.inspectedQty, a.acceptedQty, a.reworkQty, a.rejectedQty, a.total, a.partName, a.shift, a.location, DATE_FORMAT(a.created_at, '%Y-%m-%d') as date 
+            FROM addqc a ${whereClause} 
+            ORDER BY a.id DESC`, params);
 
         // Top 5 Defects
         const [defectResults] = await db.query(`
